@@ -1,6 +1,8 @@
 program Tumama;
 uses
 System.SysUtils;
+const
+Nom_Archivo = 'CRUD.txt';
 type
 Registro = record
         Nombre:String[50];
@@ -8,37 +10,27 @@ Registro = record
         Numero:Integer;
         Activo:Boolean;
        end;
+
 var
 Archivo:File of Registro;
 N,P:integer;
 S,Nomb,Apell:String;
-
-
-
-
-
+R:Registro;
 
 
 procedure  Creararchivo();
 begin
-Assignfile(Archivo ,'CRUD.txt');
-if not(FileExists(Archivo)) then
+AssignFile(Archivo ,'CRUD.dat');
+if not(Fileexists('CRUD.dat')) then
         begin
         rewrite(archivo);
         close(archivo);
         end;
 end;
 
-procedure Abrirarchivo(A:Boolean);
-begin
-if A then
-begin
-Append(Archivo);
-end
-else
+procedure Abrirarchivo();
 begin
 Reset(Archivo);
-end;
 end;
 
 
@@ -52,28 +44,28 @@ R.Nombre := Nombre;
 R.Apellido:=Apellido;
 R.Numero := Numero;
 R.Activo:=True;
-Abrirarchivo(True);
-Writeln(R);
+Abrirarchivo();
+Write(Archivo,R);
 Close(Archivo);
 end;
 
 function Buscar(N:integer):String;
 var
-N,I,P:integer; //Posición del elemento buscado  // Variable para contar la posicion
+I,P:integer; //Posición del elemento buscado  // Variable para contar la posicion
 R:Registro; // Registro para ir testeando
 begin
 Assignfile(Archivo ,'CRUD.txt');
-Abrirarchivo(False);
+Abrirarchivo();
 I:=1;
 while not(eof(Archivo)) do
     begin
-    Readln(Archivo,R);
+    Read(Archivo,R);
     if R.Numero = N then
       exit;
     end;
 Seek(Archivo,I);
-Readln(Archivo,R);
-S:=(R.nombre + Char(10) + Char(13) + R.apellido + Char(10) + Char(13) + inttostr(R.Numero) + Char(10) + Char(13);
+Read(Archivo,R);
+S:=R.nombre + Char(10) + Char(13) + R.apellido + Char(10) + Char(13) + inttostr(R.Numero) + Char(10) + Char(13);
 Buscar := S;
 end;
 
@@ -85,25 +77,12 @@ begin
 Assignfile(Archivo ,'CRUD.txt');
 while not(Eof(Archivo)) do
   begin
-  Readln(Archivo,R);
-  S:=(R.nombre + Char(10) + Char(13) + R.apellido + Char(10) + Char(13) + inttostr(R.Numero) + Char(10) + Char(13);
+  Read(Archivo,R);
+  S:=R.nombre + Char(10) + Char(13) + R.apellido + Char(10) + Char(13) + inttostr(R.Numero) + Char(10) + Char(13);
   end;
 end;
 
 
-Procedure Agregar(Nombre,Apellido:String;Numero:Integer);
-var
-R:Registro;
-begin
-Assignfile(Archivo ,'CRUD.txt');
-R.Nombre := Nombre;
-R.Apellido:=Apellido;
-R.Numero := Numero;
-R.Activo:=True;
-Abrirarchivo(True);
-Writeln(R);
-Close(Archivo);
-end;
 
 
 
@@ -112,23 +91,23 @@ var
 R:Registro;
 AAlt:File of Registro;
 begin
-Abrirarchivo(False);
+Abrirarchivo();
 Assignfile(AAlt,'Archivoalt.txt');
 Rewrite(AAlt);
 Close(AAlt);
 while not eof(Archivo) do
         begin
-        Readln(Archivo,R);
+        Read(Archivo,R);
         if R.Numero <> N then
                 begin
-                Append(Aalt);
-                WriteLn(R);
+                Reset(AAlt);
+                Write(AAlt,R);
                 Close(Aalt);
                 end;
         end;
 Close(Archivo);
 Erase(Archivo);
-Rename(Aalt,'CRUD.txt');
+Rename(AAlt,'CRUD.txt');
 end;
 
 
@@ -153,25 +132,10 @@ while N <> 0 do
       readln(Apell);
       Writeln('Ingrese el numero');
       readln(P);
-
-
-
+      Agregar(Nomb,Apell,P);
       end;
     end;
   end;
 end.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-end.
